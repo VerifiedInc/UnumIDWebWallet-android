@@ -14,4 +14,3 @@ dependencyResolutionManagement {
 }
 rootProject.name = "Unum ID Web Wallet Demo"
 include ':app'
-include ':UnumIdWebWallet'
