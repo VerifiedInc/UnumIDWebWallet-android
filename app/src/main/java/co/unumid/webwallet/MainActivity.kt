@@ -1,85 +1,87 @@
 package co.unumid.webwallet
 
 import android.os.Bundle
-import android.util.Log
-import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
-import co.hyperverge.hyperkyc.HyperKyc
-import co.hyperverge.hyperkyc.data.models.HyperKycConfig
-import co.hyperverge.hyperkyc.data.models.result.HyperKycResult
 import co.unumid.unumidwebauth.WebWallet
-import kotlinx.coroutines.launch
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody.Companion.toRequestBody
+import java.util.*
 
+
+/**
+ * An example of how to use the web wallet verification library.
+ *
+ * Step one: start a new verification request. This will start the verification flow and return
+ * the results to the client app through a deep link.
+ *
+ * Step two: Get data from the deeplink and pass them to the web wallet library.
+ */
+
+@Suppress("KotlinConstantConditions")
 class MainActivity : AppCompatActivity() {
+
+    private var onSuccessCallback: (() -> Unit)? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        /*
-         * Setup the ability to kick off the hyperverge SDK
-         */
-        val hyperKycLauncher = registerForActivityResult(HyperKyc.Contract()) { result ->
-            when (result.status) {
-                HyperKycResult.Status.SUCCESS -> {
-                    Log.d("HyperVerge", "Success")
-                    Log.d("HyperVerge", result.toString())
+        // These values will be provided to you by UnumID
+        val setIssuer = "Your issuer DID"
+        val setPR = "Your presentation request ID"
+        val appId = "Your app ID"
+        val appKey = "Your app key"
+        val workflowId = "Your workflow ID"
 
-                    /*
-                     * Once the hyperverge sdk has finished and given a success call. Hyperverge,
-                     * as an issuer, needs to get a user code. This is what will eventually link
-                     * the hypervege kyc data to the Unum ID user.
-                     */
-                    getUserCode(result.toString())
-                }
-                HyperKycResult.Status.CANCELLED -> {
-                    Log.d("HyperVerge", "Cancelled")
-                }
-                HyperKycResult.Status.FAILURE -> {
-                    Log.e("HyperVerge", "FAILURE")
-                    Log.e("HyperVerge", result.reason ?: "No Reason given")
+        WebWallet.setStateValues(setIssuer, setPR, appId, appKey, workflowId)
+
+        /**
+         * Step 2:
+         * After a verification attempt has been made, the results will be returned though a deep link.
+         * These results can be sent back to the web wallet library. In the case of an error, the client
+         * app can display the error or handle it in some other way.
+         */
+        val intent = intent
+        val data = intent.data
+        if (data != null) {
+            if (data.toString().contains("://auth")) {
+                val subjectDid = data.getQueryParameter("subjectDid")
+                val error = data.getQueryParameter("error")
+                // if no values are passed, it is a successful presentation request
+                if (subjectDid?.isEmpty() == true && error?.isEmpty() == true) {
+                    onSuccessCallback?.invoke()
+                } else if (subjectDid?.isEmpty() == false) {
+                    // let the web wallet handle the response
+                    WebWallet.handleAuthResponse(data, this)
+                } else {
+                    // show an error
                 }
             }
         }
 
-        findViewById<Button>(R.id.button).setOnClickListener {
-            val config =
-                HyperKycConfig(
-                    "*******",
-                    "**********",
-                    "***********",
-                    "***********"
-                )
-
-            Log.d("HyperVerge", "Starting")
-            hyperKycLauncher.launch(config)
-        }
     }
 
-    private fun getUserCode(response: String) {
-        val body = response.toRequestBody("text/plain".toMediaTypeOrNull())
-        lifecycleScope.launch {
-            val result = UnumRetrofitClient.getApiInterface().postHyperVergeData(body)
-            result.body()?.userCode?.let {
+    /**
+     * Step 1:
+     * This is the method called to start the verification process
+     */
+    fun performVerification(verifiedCallback: () -> Unit) {
+        // the callback the client app would like to use once the verification process has been completed
+        onSuccessCallback = verifiedCallback
 
+        val deeplink = "YourCustomDeeplinkScheme" // this should match the value in the manifest
 
-                /*
-                 * Once the user code has been created, this information can be passed to the Unum ID
-                 * Web Wallet SDK.
-                 */
-                WebWallet.associate(
-                    userCode = it, // the newly created user code
-                    issuerDid = "********************", // your issuer DID
-                    context = this@MainActivity, // context
-//                    userEmail = "user@email.com" // optional email value to that will be pre-filled
-//                    toolBarColor = "#202020" // optional toolbar color to help the web browser match the color of the app
-                )
+        val appId = "Your app ID"
+        val appKey = "Your app key"
+        val workflowId = "Your workflow ID"
+        val transactionId = "a unique transaction ID"
 
-
-
-            }
-        }
+        // start the verification
+        WebWallet.performVerification(
+            appId,
+            appKey,
+            workflowId,
+            transactionId,
+            deeplink,
+            this, // context
+        )
     }
 }
