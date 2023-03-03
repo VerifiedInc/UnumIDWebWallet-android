@@ -10,6 +10,14 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven {
+            url = uri("https://maven.pkg.github.com/UnumID/UnumIDWebWallet-android")
+            credentials {
+                username = "provided username"
+                password = "provided password"
+            }
+        }
+        maven { url "https://jitpack.io" }
     }
 }
 rootProject.name = "Unum ID Web Wallet Demo"

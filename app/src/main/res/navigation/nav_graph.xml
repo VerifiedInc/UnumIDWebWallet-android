@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/splashScreenFragment"
-        android:name="co.unumid.idvdemo.fragments.SplashScreenFragment"
+        android:name="co.unumid.webwallet.fragments.SplashScreenFragment"
         android:label="fragment_splash_screen"
         tools:layout="@layout/fragment_splash_screen">
         <action
@@ -18,10 +18,17 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_splashScreenFragment_to_KSignUpFragment"
+            app:destination="@id/KSignUpFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/homeFragment"
-        android:name="co.unumid.idvdemo.fragments.HomeFragment"
+        android:name="co.unumid.webwallet.fragments.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home">
         <action
@@ -32,10 +39,11 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
+
     </fragment>
     <fragment
         android:id="@+id/accountCreatedFragment"
-        android:name="co.unumid.idvdemo.fragments.AccountCreatedFragment"
+        android:name="co.unumid.webwallet.fragments.AccountCreatedFragment"
         android:label="fragment_account_created"
         tools:layout="@layout/fragment_account_created">
         <action
@@ -49,7 +57,25 @@
     </fragment>
     <fragment
         android:id="@+id/verifiedFragment"
-        android:name="co.unumid.idvdemo.fragments.VerifiedFragment"
+        android:name="co.unumid.webwallet.fragments.VerifiedFragment"
         android:label="fragment_verified"
         tools:layout="@layout/fragment_verified" />
+    <fragment
+        android:id="@+id/KSignUpFragment"
+        android:name="co.unumid.webwallet.fragments.KSignUpFragment"
+        android:label="fragment_k_sign_up"
+        tools:layout="@layout/fragment_k_sign_up">
+        <action
+            android:id="@+id/action_KSignUpFragment_to_KVerifiedFragment"
+            app:destination="@id/KVerifiedFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/KVerifiedFragment"
+        android:name="co.unumid.webwallet.fragments.KVerifiedFragment"
+        android:label="fragment_k_verified"
+        tools:layout="@layout/fragment_k_verified" />
 </navigation>

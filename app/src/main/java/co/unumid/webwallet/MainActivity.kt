@@ -1,8 +1,11 @@
 package co.unumid.webwallet
 
 import android.os.Bundle
+import android.text.InputType
+import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import co.unumid.unumidwebauth.WebWallet
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.util.*
 
 
@@ -20,21 +23,14 @@ class MainActivity : AppCompatActivity() {
 
     private var onSuccessCallback: (() -> Unit)? = null
 
+    var hasError = false
+    var errorMessage = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // These values will be provided to you by UnumID
-        val setIssuer = "Your issuer DID"
-        val setPR = "Your presentation request ID"
-        val appId = "Your app ID"
-        val appKey = "Your app key"
-        val workflowId = "Your workflow ID"
-
-        WebWallet.setStateValues(setIssuer, setPR, appId, appKey, workflowId)
-
         /**
-         * Step 2:
          * After a verification attempt has been made, the results will be returned though a deep link.
          * These results can be sent back to the web wallet library. In the case of an error, the client
          * app can display the error or handle it in some other way.
@@ -59,29 +55,23 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    /**
-     * Step 1:
-     * This is the method called to start the verification process
-     */
-    fun performVerification(verifiedCallback: () -> Unit) {
-        // the callback the client app would like to use once the verification process has been completed
-        onSuccessCallback = verifiedCallback
+    fun showDialog() {
+        val builder = MaterialAlertDialogBuilder(this)
+        builder.setTitle("Submit Error")
 
-        val deeplink = "YourCustomDeeplinkScheme" // this should match the value in the manifest
+        val input = EditText(this)
+        input.hint = "Enter Error message"
+        input.inputType = InputType.TYPE_CLASS_TEXT
+        builder.setView(input)
 
-        val appId = "Your app ID"
-        val appKey = "Your app key"
-        val workflowId = "Your workflow ID"
-        val transactionId = "a unique transaction ID"
+        builder.setPositiveButton("OK") { dialog, _ ->
+            // do something with error
+            dialog.cancel()
+        }
+        builder.setNegativeButton(
+            "Cancel"
+        ) { dialog, _ -> dialog.cancel() }
 
-        // start the verification
-        WebWallet.performVerification(
-            appId,
-            appKey,
-            workflowId,
-            transactionId,
-            deeplink,
-            this, // context
-        )
+        builder.show()
     }
 }

@@ -17,9 +17,29 @@ android {
     }
 
     buildTypes {
+        debug {
+            applicationIdSuffix ".debug"
+            manifestPlaceholders = [ applicationLabel: "@string/app_name_dev" ]
+            debuggable true
+        }
         release {
+            initWith debug
+            manifestPlaceholders = [ applicationLabel: "@string/app_name"]
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    flavorDimensions "version"
+    productFlavors {
+        hooli {
+            dimension "version"
+            applicationIdSuffix ".hooli"
+            manifestPlaceholders = [ deeplink: "hooli"] // deep link redirect
+        }
+        kredita {
+            dimension "version"
+            applicationIdSuffix ".kredita"
+            manifestPlaceholders = [ deeplink: "kredita"] // deep link redirect
         }
     }
     compileOptions {
@@ -56,5 +76,5 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment-ktx:2.5.3"
     implementation "androidx.navigation:navigation-ui-ktx:2.5.3"
 
-    implementation "id.unum.webauth:newest-version"
+    implementation "id.unum.verified-android:latest-version"
 }
